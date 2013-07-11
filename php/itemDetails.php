@@ -21,6 +21,14 @@ $itemset = $stmt->get_result();
 
 $aItem = $itemset->fetch_assoc();
 
+$stmtColors = $mysqli->prepare("SELECT color FROM item_colors WHERE itemid = ?");
+
+$stmtColors->bind_param("d", $nItemId);
+
+$stmtSizes = $mysqli->prepare("SELECT size FROM item_sizes WHERE itemid = ?");
+
+$stmtSizes->bind_param("d", $nItemId);
+
 ?>
 <!DOCTYPE html>
 <html>
@@ -41,5 +49,55 @@ $aItem = $itemset->fetch_assoc();
 	</p>
 	<img alt="<?php echo $aItem["name"] ?>"
 		src="images/<?php echo $aItem["image"]?>" />
+	<?php 
+	$stmtColors->execute();
+	$colorsset = $stmtColors->get_result();
+	if($colorsset->num_rows == 1)
+	{
+		$aColor = $colorsset->fetch_assoc();
+		echo "<p>This item comes in any color so long as it is ", $aColor["color"], "</p>";
+	}
+	else
+	{?>
+
+	<fieldset>
+		<legend>Color</legend>
+		<?php
+		while ($aColor = $colorsset->fetch_assoc())
+		{
+			echo "<p><input type=\"radio\" name=\"color\" value=\"", $aColor["color"], "\"/>";
+			echo $aColor["color"], "</p>";
+		}
+		?>
+
+	</fieldset>
+
+	<?php }
+
+	$stmtSizes->execute();
+	$sizesset = $stmtSizes->get_result();
+	if($sizesset->num_rows == 1)
+	{
+		$aSize = $sizesset->fetch_assoc();
+		echo "<p>This item is ", $aSize["size"], "</p>";
+	}
+	else
+		{?>
+
+	<fieldset>
+		<legend>Sizes</legend>
+		<?php
+		while ($aSize = $sizesset->fetch_assoc())
+		{
+			echo "<p><input type=\"radio\" name=\"size\" value=\"", $aSize["size"], "\"/>";
+			echo $aSize["size"], "</p>";
+		}
+		?>
+
+	</fieldset>
+
+	<?php }
+
+	?>
 </body>
 </html>
