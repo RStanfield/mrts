@@ -35,6 +35,7 @@ $stmtSizes->bind_param("d", $nItemId);
 <head>
 <title>Item Details for <?php echo $aItem["name"] ?>
 </title>
+<link rel="stylesheet" href="style/mrts.css" />
 </head>
 <body>
 	<h1>
@@ -49,55 +50,60 @@ $stmtSizes->bind_param("d", $nItemId);
 	</p>
 	<img alt="<?php echo $aItem["name"] ?>"
 		src="images/<?php echo $aItem["image"]?>" />
-	<?php 
-	$stmtColors->execute();
-	$colorsset = $stmtColors->get_result();
-	if($colorsset->num_rows == 1)
-	{
-		$aColor = $colorsset->fetch_assoc();
-		echo "<p>This item comes in any color so long as it is ", $aColor["color"], "</p>";
-	}
-	else
+	<form action="shoppingcart.php" method="post">
+	<input type="hidden" name="itemid" value="<?php echo $nItemId?>" />
+	<p><label for="qty">Quantity</label><br /><input name="qty" value="1" /></p>
+	<input type="submit" value="Add To Cart" />
+		<?php 
+		$stmtColors->execute();
+		$colorsset = $stmtColors->get_result();
+		if($colorsset->num_rows == 1)
+		{
+			$aColor = $colorsset->fetch_assoc();
+			echo "<p>This item comes in any color so long as it is ", $aColor["color"], "</p>";
+		}
+		else
 	{?>
 
-	<fieldset>
-		<legend>Color</legend>
-		<?php
-		while ($aColor = $colorsset->fetch_assoc())
+		<fieldset>
+			<legend>Color</legend>
+			<?php
+			while ($aColor = $colorsset->fetch_assoc())
+			{
+				echo "<p><input type=\"radio\" name=\"color\" value=\"", $aColor["color"], "\"/>";
+				echo $aColor["color"], "</p>";
+			}
+			?>
+
+		</fieldset>
+
+		<?php }
+
+		$stmtSizes->execute();
+		$sizesset = $stmtSizes->get_result();
+		if($sizesset->num_rows == 1)
 		{
-			echo "<p><input type=\"radio\" name=\"color\" value=\"", $aColor["color"], "\"/>";
-			echo $aColor["color"], "</p>";
+			$aSize = $sizesset->fetch_assoc();
+			echo "<p>This item is ", $aSize["size"], "</p>";
 		}
-		?>
-
-	</fieldset>
-
-	<?php }
-
-	$stmtSizes->execute();
-	$sizesset = $stmtSizes->get_result();
-	if($sizesset->num_rows == 1)
-	{
-		$aSize = $sizesset->fetch_assoc();
-		echo "<p>This item is ", $aSize["size"], "</p>";
-	}
-	else
+		else
 		{?>
 
-	<fieldset>
-		<legend>Sizes</legend>
-		<?php
-		while ($aSize = $sizesset->fetch_assoc())
-		{
-			echo "<p><input type=\"radio\" name=\"size\" value=\"", $aSize["size"], "\"/>";
-			echo $aSize["size"], "</p>";
-		}
-		?>
+		<fieldset>
+			<legend>Sizes</legend>
+			<?php
+			while ($aSize = $sizesset->fetch_assoc())
+			{
+				echo "<p><input type=\"radio\" name=\"size\" value=\"", $aSize["size"], "\"/>";
+				echo $aSize["size"], "</p>";
+			}
+			?>
 
-	</fieldset>
+		</fieldset>
 
-	<?php }
+		<?php }
 
 	?>
+	</form>
 </body>
 </html>

@@ -26,10 +26,10 @@ else
 <!DOCTYPE html>
 <html>
 <head>
-<title>Mr. T's T-Shirts</title>
+<title>Mr. T's T-Shirts and More</title>
 </head>
 <body>
-	<h1>Mr. T's T-Shirts</h1>
+	<h1>Mr. T's T-Shirts and More</h1>
 	<?php while($row = $res->fetch_assoc())
 	{
 
