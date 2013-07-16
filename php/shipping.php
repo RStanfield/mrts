@@ -29,7 +29,7 @@
 		</p>
 		<p>
 			<label for="postcode">Postal/Zip Code:</label><br /> <input
-				type="text" name="postcodes" />
+				type="text" name="postcode" />
 		</p>
 		<p>
 			<label for="specialinstructions">Special Instructions:</label><br />
