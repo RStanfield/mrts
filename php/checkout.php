@@ -47,6 +47,10 @@ foreach($_SESSION["shoppingcart"] as $item)
 	array_push($aOrderItems, $orderItem);
 }
 
+// begin a database transaction
+
+$mysqli->autocommit(false);
+
 // compile statement
 
 $sSQL = "INSERT INTO orders(customername, address1, address2, city, stateprovince, postcode, " .
@@ -54,14 +58,17 @@ $sSQL = "INSERT INTO orders(customername, address1, address2, city, stateprovinc
 
 $stmtInsert = $mysqli->prepare($sSQL);
 
-$stmtInsert->bind_param("sssssssd", $_POST["customername"], $_POST["address1"], $_POST["address2"], $_POST["city"], $_POST["stateprovince"],
-		$_POST["postcode"], $_POST["specialinstructions"], $nTotalCost);
+$stmtInsert->bind_param("sssssssd", $_POST["customername"], $_POST["address1"], $_POST["address2"], $_POST["city"],
+		$_POST["stateprovince"], $_POST["postcode"], $_POST["specialinstructions"], $nTotalCost);
 
 $stmtInsert->execute();
 
 if($stmtInsert->affected_rows != 1)
 {
+	// we should have inserted 1 row here
 	print_r($stmtInsert);
+	$mysqli->rollback();
+	return;
 }
 
 $nOrderId = $mysqli->insert_id;
@@ -75,7 +82,21 @@ foreach ($aOrderItems as $orderItem)
 	$stmtItem->bind_param("ddssdd", $orderItem->id, $nOrderId, $orderItem->color, $orderItem->size, $orderItem->qty,
 			$orderItem->price);
 	$stmtItem->execute();
+	if($stmtItem->affected_rows != 1)
+	{
+		// we should have inserted 1 row here
+		print_r($stmtItem);
+		$mysqli->rollback();
+		return;
+	}
 }
+
+// if we get here, then we have both order and order_items
+$mysqli->commit();
+
+// clear out shopping cart
+
+$_SESSION["shoppingcart"] = array();
 
 ?>
 <!DOCTYPE html>
